@@ -1,10 +1,23 @@
 import pandas as pd
 import numpy as np
 import tkinter
-# import matplotlib.pyplot as plt
+import zipfile
+import matplotlib.pyplot as plt
+pd.set_option('display.max_rows', 500)
 
 db_spec = pd.read_csv("C:/Users/CRS-P-135/Desktop/Study/Study_01/Study_01_DB Specification_V2.2.csv", encoding = 'CP949')
-SDTM = pd.read_csv("C:/Users/CRS-P-135/Desktop/SDTM.csv")   #그냥 엑셀로 열까?
+SDTM = pd.read_csv("C:/Users/CRS-P-135/Desktop/SDTM.csv")   #엑셀로 열면 깨짐 -> csv파일을 손봐야함. 모든 specification은 xlsx형식인가? 그리고 결측치는 어떻게 할 것인지?
+
+# print(SDTM.loc[:,'Variable Name'])
+
+dictionary = []
+
+for x in SDTM.loc[:, "Variable Name"]:
+    dictionary.append(x)
+    
+# print(dictionary)
+
+
 
 domain_standard = ['EN', 'SV', 'DM', 'MH', 'PE', 'VS', 'EG', 'LB', 'IE', 'RN', 'IP', 'DA', 'EX', 'CM', 'AE', 'DS', 'SN']
 Domain = []
@@ -15,21 +28,40 @@ for i in range(len(db_spec)):
         if (not((db_spec.iloc[i, 0], db_spec.iloc[i, 1]) in Domain)):
             Domain.append((db_spec.iloc[i, 0], db_spec.iloc[i, 1]))
 
-# print(Domain)
+print(Domain)
 
+#밑에 좀 비효율적인 알고리즘 같은데
 for (x, y) in Domain:
     path = "C:/Users/CRS-P-135/Desktop/Study/Study_01/DataSetCsv_20210722092440/"+ x + ".csv"
     df = pd.read_csv(path)
     data_labels = []
-    for x in df.columns:
-        data_labels.append(x)
-    print(data_labels)
+    for s in df.columns:
+        data_labels.append(s)
+    # print(data_labels)
     
-    #그다음 바로 SDTM 열어 놓은 거랑 비교?
-    
-    #print(df)
-    # break   #코드 완성전 하나씩만 돌려보려고
-    
+    for s in data_labels:
+        if s in dictionary:
+            print('hi')
+
+        elif s[0]+s[1]==x or s[0]+s[1]==y:
+            if (s[2:]) in dictionary:
+                print("Damn")
+            else:
+                print(s, "Also need here")    #여기도 NLP 필요함
+        
+        else:
+            print(s, "Need NLP")
+    #break   #코드 완성전 하나씩만 돌려보려고
+
+class NLP:
+    def __init__(self, first, second):     #hyperparameter?
+        self.first = first
+        self.second = second
+    def similarity(first, second):
+        print(1)
+
+
+
     
     
     
@@ -55,4 +87,3 @@ path1 = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetyp
 print(path1)
 
 window.mainloop()   #윈도우 창을 윈도우가 종료될 때까지 실행
-
