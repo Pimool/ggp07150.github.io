@@ -3,6 +3,9 @@ import numpy as np
 import tkinter
 import zipfile
 import matplotlib.pyplot as plt
+import time
+
+start = time.time()
 pd.set_option('display.max_rows', 500)
 
 db_spec = pd.read_csv("C:/Users/CRS-P-135/Desktop/Study/Study_01/Study_01_DB Specification_V2.2.csv", encoding = 'CP949')
@@ -37,17 +40,31 @@ for (x, y) in Domain:
     data_labels = []
     for s in df.columns:
         data_labels.append(s)
-    # print(data_labels)
+    print(data_labels)
+    
+    new_csv = df.copy()     #new_csv로 변환해서 저장할 것   
+    # print(new_csv)
+    
     
     for s in data_labels:
         if s in dictionary:
-            print('hi')
+            print(s," is in dictionary")
 
         elif s[0]+s[1]==x or s[0]+s[1]==y:
             if (s[2:]) in dictionary:
-                print("Damn")
+                print(s, s[2:],"is in dictionary")
             else:
-                print(s, "Also need here")    #여기도 NLP 필요함
+                print(s, "is not in domain dictionary")    #여기도 NLP 필요함
+                '''
+                #s[4:]도 확인? 아니면 dictionary에 있는 것을 s에 있는지 확인?
+                후자로 할거면 s[2:]부터 찾으면 될듯 (s[0]+s[1]==x or s[0]+s[1]==y)==True 인 상황이니
+                그러면 시간복잡도가 커져서 계산시간이 너무 오래걸림
+                '''
+                
+                for id in dictionary:
+                    if id in s[2:]:
+                        print(", but don't need NLP.")
+                
         
         else:
             print(s, "Need NLP")
@@ -62,28 +79,30 @@ class NLP:
 
 
 
+end = time.time()
+
+print("걸린 시간 : ", end-start)
     
     
-    
 
-#프레임만 있어도 path받아올 수 있음 굳이 tkinter 안써도 됨.
-#어쩌피 csv 경로만 가져올 것이기 때문.
-window = tkinter.Tk()   #가장 상위 레벨의 윈도우 창 생성
-import tkinter.filedialog as fd
+# #프레임만 있어도 path받아올 수 있음 굳이 tkinter 안써도 됨.
+# #어쩌피 csv 경로만 가져올 것이기 때문.
+# window = tkinter.Tk()   #가장 상위 레벨의 윈도우 창 생성
+# import tkinter.filedialog as fd
 
-window.title("EDC To SDTM") #프로그램 창의 이름
-window.geometry("1280x800+100+100")  #프로그램 크기, 위치
-window.resizable(True, True)    #프로그램 창 가로, 세로 조정 해도 되는지
+# window.title("EDC To SDTM") #프로그램 창의 이름
+# window.geometry("1280x800+100+100")  #프로그램 크기, 위치
+# window.resizable(True, True)    #프로그램 창 가로, 세로 조정 해도 되는지
 
 
-label = tkinter.Label(window, text = "What do you want to convert?")
-label.pack()    #label.pack을 해야 위젯이 배치됨.
+# label = tkinter.Label(window, text = "What do you want to convert?")
+# label.pack()    #label.pack을 해야 위젯이 배치됨.
 
-frame = tkinter.Frame(window)
-frame.pack()
+# frame = tkinter.Frame(window)
+# frame.pack()
 
-path1 = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetypes = (("Python files", "*.py"), ("csv files", "*.csv"), ("all files", "*.*")))
+# path1 = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetypes = (("Python files", "*.py"), ("csv files", "*.csv"), ("all files", "*.*")))
 
-print(path1)
+# print(path1)
 
-window.mainloop()   #윈도우 창을 윈도우가 종료될 때까지 실행
+# window.mainloop()   #윈도우 창을 윈도우가 종료될 때까지 실행
