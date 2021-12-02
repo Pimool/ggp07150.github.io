@@ -71,11 +71,15 @@ for (x, y) in Domain:
     #break   #코드 완성전 하나씩만 돌려보려고
 
 class NLP:
-    def __init__(self, first, second):     #hyperparameter?
-        self.first = first
-        self.second = second
-    def similarity(first, second):
-        print(1)
+    def __init__(self, object, target):     #hyperparameter?
+        self.object = object
+        self.target = target
+    def similarity(self, object, target):
+        '''
+        일단 코사인 유사도 생각
+        추후에 높은 성능으로 바꾸도록 한다.
+        '''
+        pass
 
 
 
@@ -85,24 +89,24 @@ print("걸린 시간 : ", end-start)
     
     
 
-# #프레임만 있어도 path받아올 수 있음 굳이 tkinter 안써도 됨.
-# #어쩌피 csv 경로만 가져올 것이기 때문.
-# window = tkinter.Tk()   #가장 상위 레벨의 윈도우 창 생성
-# import tkinter.filedialog as fd
+#프레임만 있어도 path받아올 수 있음 굳이 tkinter 안써도 됨.
+#어쩌피 csv 경로만 가져올 것이기 때문.
+window = tkinter.Tk()   #가장 상위 레벨의 윈도우 창 생성
+import tkinter.filedialog as fd
 
-# window.title("EDC To SDTM") #프로그램 창의 이름
-# window.geometry("1280x800+100+100")  #프로그램 크기, 위치
-# window.resizable(True, True)    #프로그램 창 가로, 세로 조정 해도 되는지
+window.title("EDC To SDTM") #프로그램 창의 이름
+window.geometry("1280x800+100+100")  #프로그램 크기, 위치
+window.resizable(True, True)    #프로그램 창 가로, 세로 조정 해도 되는지
 
 
-# label = tkinter.Label(window, text = "What do you want to convert?")
-# label.pack()    #label.pack을 해야 위젯이 배치됨.
+label = tkinter.Label(window, text = "What do you want to convert?")
+label.pack()    #label.pack을 해야 위젯이 배치됨.
 
-# frame = tkinter.Frame(window)
-# frame.pack()
+frame = tkinter.Frame(window)
+frame.pack()
 
-# path1 = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetypes = (("Python files", "*.py"), ("csv files", "*.csv"), ("all files", "*.*")))
+path1 = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetypes = (("Python files", "*.py"), ("csv files", "*.csv"), ("all files", "*.*")))
 
-# print(path1)
+print(path1)
 
-# window.mainloop()   #윈도우 창을 윈도우가 종료될 때까지 실행
+window.mainloop()   #윈도우 창을 윈도우가 종료될 때까지 실행
