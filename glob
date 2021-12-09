@@ -1,0 +1,8 @@
+import Tokenizer as Tok #만든 Tokenizer.py 사용
+import glob
+
+for i in range(1, 5):
+    path = glob.glob("C:/Users/CRS-P-135/Desktop/Study/Study_0"+str(i)+"/Study_0"+str(i)+"_DB*.csv")
+    for j in range(len(Tok.description_csv_to_list(str(path[0])))):
+        print(Tok.description_csv_to_list(str(path[0]))[j], Tok.tokenize(Tok.description_csv_to_list(str(path[0])))[j])
+    break       #아직 Study1만 csv로 바꿈.
