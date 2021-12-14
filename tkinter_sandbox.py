@@ -20,8 +20,9 @@ temp = None
 window = tk.Tk()   #생성구문 -> 가장 상위 레벨의 윈도우 창 생성
 
 def Browse():
-    path = fd.askopenfilename(initialdir = '/', title = "파일 탐색기", filetypes = (("csv files", "*.csv"), ("all files", "*.*")))
-    if path not in csv_path_list:
+    path = fd.askopenfilename(initialdir = "C:/Users/CRS-P-135/Desktop/", title = "파일 탐색기", filetypes = (("csv files", "*.csv"), ("all files", "*.*")))
+
+    if path not in csv_path_list and path != "":
         csv_path_list.append(path)
         csv_list.insert("end", ntpath.basename(path))
 
@@ -51,6 +52,35 @@ def Convert():
     3. SDTM mapping rule 새로운 window창으로 켜기
     '''
 
+    global df_right, table_after
+
+    df_new = df_right.copy()
+    df_new.rename(columns = {"Version" : "Cheese"}, inplace = True)
+
+    diff_list = []
+    def change_color(val):
+
+        # global diff_list
+        # for i in range(len(df_right)):
+        #     for j in range(len(df_right.columns)):
+        #         if df_new[i][j] != df_right[i][j]:
+        #             diff_list.append((i, j))
+
+        color = "red"
+
+        return "color : %s" % color
+
+
+    df_new.style.applymap(change_color)
+    df_right = df_new
+    table_after.model.df = df_right
+
+    ps.themes["red"] = {'cellbackgr':'#F4F4F3','grid_color':'#ABB1AD', 'textcolor': "red", 'rowselectedcolor':'#E4DED4', 'colselectedcolor':'#e4e3e4'}
+
+    table_after.setTheme("red")
+
+    table_after.show()
+
     pass
 
 def Contact():
@@ -67,10 +97,19 @@ def Contact():
     Contact_window.mainloop()
 
 def Save():
-    path = csv_path_list[temp[0]][:-4]
+    path = csv_path_list[temp[0]][:-4]      # .csv -> 4글자
     df_right.to_csv(path+"_new.csv", encoding = "euc-kr", index = False)
 
+    Save_window = tk.Tk()
+    Save_window.iconbitmap("C:/Users/CRS-P-135/Desktop/20211130_162430.ico")
+    Save_window.title("Saved")  # 프로그램 창의 이름
+    Save_window.geometry("250x125+900+450")  # 프로그램 크기, 위치
+    Save_window.resizable(False, False)  # 프로그램 창 가로, 세로 조정 해도 되는지
 
+    label = tk.Label(Save_window, text="Saved successfully", font=tk.font.Font(size=20, weight="bold"), relief="flat")
+    label.place(relx = 0.5, rely = 0.5, anchor = "center")
+
+    Save_window.mainloop()
 
 class Button:
     def __init__(self, frame_num, text):
@@ -90,7 +129,7 @@ class Button:
 
 window.iconbitmap("C:/Users/CRS-P-135/Desktop/20211130_162430.ico")
 window.title("EDC To SDTM") #프로그램 창의 이름
-window.geometry("1280x800+100+100")  #프로그램 크기, 위치
+window.geometry("1280x800+300+100")  #프로그램 크기, 위치
 window.resizable(True, True)    #프로그램 창 가로, 세로 조정 해도 되는지
 window.configure(bg = 'beige')
 
@@ -111,6 +150,7 @@ Buttons
 convert_button = Button(frame_num = 3, text = "Convert")
 # convert_button.button.config(window = frame1)
 convert_button.button.pack(side = "left", fill = "y")
+convert_button.button.config(command = Convert)
 
 save_button = Button(frame_num = 3, text = "Save")
 # save_button.button.config(window = frame1)
@@ -118,7 +158,6 @@ save_button.button.pack(side = "right", fill = "y")
 save_button.button.config(command = Save)
 
 # if convert_button.cget("state") == "active":
-
 
 
 
@@ -191,12 +230,13 @@ menubar.add_command(label = "Open")
 menubar.add_command(label = "Save")
 menubar.add_cascade(label = "Files", menu = menu_files)
 
-
 menu_help = tk.Menu(menubar, tearoff = 0)
 menu_help.add_command(label = "Contact", command = Contact)
 menubar.add_cascade(label = "Help", menu = menu_help)
 
-
 window.config(menu = menubar)
 
+"""
+종료
+"""
 window.mainloop()   #반복구문 -> 윈도우 창을 윈도우가 종료될 때까지 실행
