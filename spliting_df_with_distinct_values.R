@@ -68,6 +68,7 @@ split_func = function(df){
     }
   }
   
+  start_time = Sys.time()
   
   df_target = subset(df, select = targets)
   print(df_target[1:5,])
@@ -99,4 +100,6 @@ split_func = function(df){
     assign(name_list[index], df_dic[index], envir = .GlobalEnv)
   }
   
+  end_time = Sys.time()
+  print(end_time-start_time)
 } 
