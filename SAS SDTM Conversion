@@ -1,0 +1,121 @@
+/* Library 생성 */
+%LET LIB = T;
+%LET STUDY = CJ_APA_305;
+%LET PATH =  \\10.0.80.212\CRScube\04.과제개발\!SAS_TEST_FOLDER\HJM\04.Programming;
+LIBNAME &LIB "&PATH/SAS";
+options fmtsearch = (&LIB..FORMAT WORK) mprint;
+
+/*Main Table 만들기: EN, DM, SV_TRANSPOSE, RN, DS*/
+proc transpose data=T.SV out=TRSV prefix=V;
+var SVDTC;
+ID VISIT;
+by SUBJID;
+run;/*프로시져는 run으로 끝남*/
+ 
+proc SQL;
+CREATE TABLE DM AS
+SELECT EN.VISIT
+FROM T.EN
+QUIT;
+
+proc SQL;
+ALTER TABLE DM
+ADD STUDYID char(20), DOMAIN char(20), USUBJID char(20);
+UPDATE DM SET STUDYID = "IN_APA_305", DOMAIN = "DM", USUBJID = STUDYID + "_" + SUBJID;
+Quit;
+
+proc SQL;
+ALTER TABLE DM
+DROP VISIT;
+QUIT;
+
+proc SQL;
+ALTER TABLE DM
+ADD S
+SELECT 
+QUIT;
+
+/*
+proc sql;
+CREATE TABLE MAIN AS
+SELECT EN.SUBJID, EN.ICDTC,
+DM.AGE, DM.SEX,
+SV.V1, SV.V2, SV.V3, SV.V4,
+RN.RNNO, RN.RNYN,
+DS.DSCOMPL, DS.DSDTC
+from T.EN
+left join T.DM on EN.SUBJID=DM.SUBJID
+left join TRSV SV on EN.SUBJID=SV.SUBJID
+left join T.RN on EN.SUBJID=RN.SUBJID
+left join T.DS on EN.SUBJID=DS.SUBJID;
+left join
+QUIT;
+*/
+
+/*TV 완성*/
+
+proc SQL;
+CREATE TABLE TV
+(STUDYID CHAR(12),
+DOMAIN CHAR,
+VISITNUM NUM,
+VISIT CHAR,
+VISITDY NUM,
+ARMCD CHAR,
+ARM CHAR,
+TVSTRL CHAR(100),
+TVENRL CHAR(20));
+
+INSERT INTO TV
+(STUDYID, DOMAIN, VISITNUM, VISIT, VISITDY, TVSTRL)
+VALUES ('IN_APA_305', 'TV', 1, 'Visit[1]', -14, 'Start day of Screening Epoch')
+VALUES ('IN_APA_305', 'TV', 2, 'Visit[2]', 1, 'Start day of Treatment Epoch')
+VALUES ('IN_APA_305', 'TV', 3, 'Visit[3]', 29, '28 days after Start of Treatment Epoch')
+VALUES ('IN_APA_305', 'TV', 4, 'Visit[4]', 85, '84 days after Start of Treatment Epoch')
+VALUES ('IN_APA_305', 'TV', 5, 'Visit[5]', 169, '168 days after Start of Treatment Epoch');
+QUIT; 
+
+proc SQL;
+INSERT INTO TV
+VALUES ('IN_APA_305', 'TV', 6, 'Visit[6]', 183, '', '', 'Start day of Follow-up Epoch', 'At Trial Exit');
+QUIT;
+
+/*TA 완성 */
+
+proc SQL;
+CREATE TABLE TA
+(STUDYID CHAR(12),
+DOMAIN CHAR,
+ARMCD CHAR,
+ARM CHAR(20),
+TAETORD NUM,
+ETCD CHAR,
+ELEMENT CHAR(20),
+TABRANCH CHAR(100),
+TATRANS CHAR,
+EPOCH CHAR(20));
+
+INSERT INTO TA
+(STUDYID, DOMAIN, ARMCD, ARM, TAETORD, ETCD, ELEMENT, TABRANCH, EPOCH)
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Tegoprazan 25mg', 1, 'SCRN', 'Screening', 'Randomized to Tegoprazan 25mg', 'SCREENING')
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Tegoprazan 25mg', 2, 'TAC', 'Tegoprazan 25mg', '', 'TREATMENT')
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Tegoprazan 25mg', 3, 'FU', 'Follow-up', '', 'FOLLOW-UP')
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Lansoprazole 15mg', 1, 'SCRN', 'Screening', 'Randomized to Lansoprazole 15mg', 'SCREENING')
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Lansoprazole 15mg', 2, 'LAC', 'Lansoprazole 15mg', '', 'TREATMENT')
+VALUES ('IN_APA_305', 'TA', 'TAC', 'Lansoprazole 15mg', 3, 'FU', 'Follow-up', '', 'FOLLOW-UP');
+
+
+
+
+proc SQL;
+CREATE TABLE SV AS
+SELECT TV.VISITNUM, TV.VISIT, TV.VISITDY,
+SE.EPOCH,
+SV.SVDTC
+/*DM.RFSTDTC*/
+from T.SV
+left join TV on TV.SUBJID = SV.SUBJID
+left join T.SE on SE.SUBJID = SV.SUBJID
+left join DM on DM.SUBJID = SV.SUBJID;
+QUIT;
+
