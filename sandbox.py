@@ -1,25 +1,44 @@
-import Tokenizer as Tok
-from gensim.models import Word2Vec
-from gensim.models import KeyedVectors
+# import requests
+# from bs4 import BeautifulSoup
 
-'''
-size = 워드 벡터의 특징 값. 즉, 임베딩 된 벡터의 차원
-window = context 윈도우 크기
-min_count = 단어 최소 빈도 수 제한
-workers = 학습을 위한 프로세스 수
-sg 0 -> CBOW, 1 -> Skip-gram
-'''
+# webpage = requests.get('http://www.google.com/search?q=JeilPharma&hl=en')
+# soup = BeautifulSoup(webpage.content, "html.parser")
 
-contents = Tok.tokenize(Tok.description_csv_to_list("C:/Users/CRS-P-135/Desktop/Study/Study_01/Study_01_DB Specification_V2.2.csv"))
+# print(soup.h)]
 
-# print(contents)
+import pandas as pd
 
-model = Word2Vec(sentences = contents, vector_size = 100, window = 5, min_count = 5, workers = 10, sg = 0)
+df = pd.read_csv('C:/Users/CRS-P-135/Desktop/clinicaltrials_gov_data.csv', encoding = 'utf=8-sig')
+
+def korea():
+    df_korea = df[df['Study_Country'] == 'Korea, Republic of'].reset_index(drop = True)
+    df_korea = df_korea.drop(['Unnamed: 0'], axis = 1)
+    df_korea.to_csv('C:/Users/CRS-P-135/Desktop/한국임상data.csv', encoding = 'utf-8-sig', index = False)
 
 
-print(model.wv.most_similar(["고혈압"]))
-# model_result = model.wv.most_similar("방문")
-# print(model_result)
+def country_frequency():
+    df_country = df.groupby('Study_Country').size().reset_index(name = 'Frequency')
+    df_country = df_country.sort_values('Frequency', ascending = False)
+    df_country.reset_index(drop = True)
+    df_country.to_csv('C:/Users/CRS-P-135/Desktop/나라별data.csv', encoding = 'utf-8-sig', index = False)
 
-# model.wv.save_word2vec_format("EDC_Description")
+def from_20_to_22():
+    df_20_22 = df[df['Study_date_first'].str.contains('2020|2021|2022')]
+    df_20_22 = df_20_22.drop(['Unnamed: 0'], axis = 1).reset_index(drop = True)
+    # print(df_20_22.columns)
+    df_sponsor = df_20_22.drop_duplicates(['Sponsor'])[['Sponsor', 'Study_Country']].reset_index(drop = True)
+    df_us = df_sponsor[df_sponsor['Study_Country'].isin(['United States', 'Australia']) 'United States'].reset_index(drop = True)
+    
+    
+    df_us.index += 1
 
+    writer = pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/2020-2022.xlsx', engine = 'openpyxl')
+    df_20_22.to_excel(writer, sheet_name = '총data', index = False)
+    df_sponsor.to_excel(writer, sheet_name = 'Sponsor목록', index = False)
+    df_us.to_excel(writer, sheet_name = 'US,임상')
+    df_us.to_excel(writer, sheet_name = '')
+    writer.save()
+
+# df_20_22.to_csv('C:/Users/CRS-P-135/Desktop/2020-2022.csv', encoding = 'utf-8-sig', index = False)
+if __name__ == "__main__":
+    from_20_to_22()
