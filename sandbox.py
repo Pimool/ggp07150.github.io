@@ -53,9 +53,41 @@ def test():
     df_test = df_test[['Sponsor', 'Study_Country']].reset_index(drop = True)
     df_test.index += 1 
     df_test.to_csv('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/test.csv', encoding = 'utf-8-sig')
-    df_test
-    
 
+
+def quarter():
+
+    year_quarter = {
+        'Jan' : '1Q',
+        'Feb' : '1Q',
+        'Mar' : '1Q',
+        'Apr' : '2Q',
+        'May' : '2Q',
+        'Jun' : '2Q',
+        'Jul' : '3Q',
+        'Aug' : '3Q',
+        'Sep' : '3Q',
+        'Oct' : '4Q',
+        'Nov' : '4Q',
+        'Dec' : '4Q'
+    }
+    df_quarter_US = pd.DataFrame({'1Q' : [0]*24, '2Q' : [0]*24, '3Q' : [0]*24, '4Q' : [0]*24}, index = range(1999, 2023))
+    df_quarter_AU = pd.DataFrame({'1Q' : [0]*24, '2Q' : [0]*24, '3Q' : [0]*24, '4Q' : [0]*24}, index = range(1999, 2023))
+    
+    df_all = pd.read_csv('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/clinicaltrials_gov_data.csv', encoding = 'utf-8-sig')
+    df_quarter_US_tmp = df_all[df_all['Study_Country'] == 'United States'] 
+    df_quarter_AU_tmp = df_all[df_all['Study_Country'] == 'Australia']
+    for row_US in range(len(df_quarter_US_tmp)):
+        day_US = df_quarter_US_tmp.iloc[row_US]['Study_date_first']
+        df_quarter_US.loc[int(day_US[-4:])][year_quarter[day_US[:3]]] += 1
+    for row_AU in range(len(df_quarter_AU_tmp)):
+        day_AU = df_quarter_AU_tmp.iloc[row_AU]['Study_date_first']
+        df_quarter_AU.loc[int(day_AU[-4:])][year_quarter[day_AU[:3]]] += 1
+
+    writer = pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/분기별 임상수_US_AU.xlsx', engine = 'openpyxl')
+    df_quarter_US.to_excel(writer, sheet_name = 'United States')
+    df_quarter_AU.to_excel(writer, sheet_name = 'Australia')
+    writer.save()
 
 def test_2():
     df_korea_tmp = pd.read_csv('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/test.csv', encoding = 'utf-8-sig')
@@ -70,4 +102,4 @@ def test_2():
 
 # df_20_22.to_csv('C:/Users/CRS-P-135/Desktop/2020-2022.csv', encoding = 'utf-8-sig', index = False)
 if __name__ == "__main__":
-    test_2()
+    quarter()
