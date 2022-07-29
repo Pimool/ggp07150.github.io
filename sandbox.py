@@ -1,12 +1,5 @@
-# import requests
-# from bs4 import BeautifulSoup
-
-# webpage = requests.get('http://www.google.com/search?q=JeilPharma&hl=en')
-# soup = BeautifulSoup(webpage.content, "html.parser")
-
-# print(soup.h)]
-
 import pandas as pd
+
 
 df = pd.read_csv('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/clinicaltrials_gov_data.csv', encoding = 'utf=8-sig')
 
@@ -100,6 +93,22 @@ def test_2():
     with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', mode = 'a', engine = 'openpyxl') as writer:
         df_korea_ct.to_excel(writer, sheet_name = '한국bio')
 
+def kor_bio_global():
+    df_20_22_sponsor = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'Sponsor목록')
+    df_us_au_all = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'US,Australia임상')
+    df_us_au_kor = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'test')
+    list_kor = df_us_au_kor['Sponsor'].dropna().to_list()
+    list_kor.remove('  ')                    #마지막 공백 존재
+    list_us_au = df_us_au_all['Sponsor'].to_list()
+    list_to_exclude = [Sponsor for Sponsor in list_us_au if not Sponsor in list_kor]
+    list_20_22 = df_20_22_sponsor['Sponsor'].to_list()
+    list_to_find = [Sponsor for Sponsor in list_20_22 if not Sponsor in list_to_exclude]
+    df_tmp = pd.DataFrame({'Sponsor' : list_to_find})
+    
+    with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', mode = 'a', engine = 'openpyxl') as writer:
+        df_tmp.to_excel(writer, sheet_name = 'new_test')
+
+
 # df_20_22.to_csv('C:/Users/CRS-P-135/Desktop/2020-2022.csv', encoding = 'utf-8-sig', index = False)
 if __name__ == "__main__":
-    quarter()
+    kor_bio_global()
