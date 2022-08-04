@@ -93,7 +93,7 @@ def test_2():
     with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', mode = 'a', engine = 'openpyxl') as writer:
         df_korea_ct.to_excel(writer, sheet_name = '한국bio')
 
-def kor_bio_global():
+def kor_bio_global_setup():
     df_20_22_sponsor = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'Sponsor목록')
     df_us_au_all = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'US,Australia임상')
     df_us_au_kor = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'test')
@@ -108,7 +108,81 @@ def kor_bio_global():
     with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', mode = 'a', engine = 'openpyxl') as writer:
         df_tmp.to_excel(writer, sheet_name = 'new_test')
 
+def kor_bio_global():
+    df_20_22_setup = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'new_test')
+    kor_list = df_20_22_setup['Sponsor'].dropna().to_list()
+    df_20_22 = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = '총data')
+    df_20_22_korea = df_20_22[df_20_22['Sponsor'].isin(kor_list)].reset_index(drop = True)
+    df_20_22_korea = df_20_22_korea.sort_values(by = ['Study_Country', 'Sponsor'])
+    with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', mode = 'a', engine = 'openpyxl') as writer:
+        df_20_22_korea.to_excel(writer, sheet_name = '한국bio전체', index = False)
+
+def quarter_2():
+
+    year_quarter = {
+        'Jan' : '1Q',
+        'Feb' : '1Q',
+        'Mar' : '1Q',
+        'Apr' : '2Q',
+        'May' : '2Q',
+        'Jun' : '2Q',
+        'Jul' : '3Q',
+        'Aug' : '3Q',
+        'Sep' : '3Q',
+        'Oct' : '4Q',
+        'Nov' : '4Q',
+        'Dec' : '4Q'
+    }
+    df_quarter_US = pd.DataFrame({'1Q' : [0]*3, '2Q' : [0]*3, '3Q' : [0]*3, '4Q' : [0]*3}, index = range(2020, 2023))
+    df_quarter_AU = pd.DataFrame({'1Q' : [0]*3, '2Q' : [0]*3, '3Q' : [0]*3, '4Q' : [0]*3}, index = range(2020, 2023))
+    
+    df_all = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = '한국bio전체')
+    df_quarter_US_tmp = df_all[df_all['Study_Country'] == 'United States'] 
+    df_quarter_AU_tmp = df_all[df_all['Study_Country'] == 'Australia']
+    for row_US in range(len(df_quarter_US_tmp)):
+        day_US = df_quarter_US_tmp.iloc[row_US]['Study_date_first']
+        df_quarter_US.loc[int(day_US[-4:])][year_quarter[day_US[:3]]] += 1
+    for row_AU in range(len(df_quarter_AU_tmp)):
+        day_AU = df_quarter_AU_tmp.iloc[row_AU]['Study_date_first']
+        df_quarter_AU.loc[int(day_AU[-4:])][year_quarter[day_AU[:3]]] += 1
+
+    writer = pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/sandbox.xlsx', engine = 'openpyxl')
+    df_quarter_US.to_excel(writer, sheet_name = 'United States')
+    df_quarter_AU.to_excel(writer, sheet_name = 'Australia')
+    writer.save()
+
+def from_18_to_19():
+    df_18_19 = df[df['Study_date_first'].str.contains('2018|2019')]
+    df_18_19 = df_18_19.drop(['Unnamed: 0'], axis = 1).reset_index(drop = True)
+    df_18_19_unique = df_18_19.drop_duplicates(['Sponsor']).reset_index(drop = True)
+    list_18_19 = df_18_19_unique['Sponsor'].to_list()
+    df_kor = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'new_test')
+    list_kor = df_kor['Sponsor'].dropna().to_list()
+    df_20_22 = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2020-2022.xlsx', sheet_name = 'Sponsor목록')
+    list_20_22_non_kor = [Sponsor for Sponsor in df_20_22['Sponsor'].to_list() if not Sponsor in list_kor]
+    list_18_19_non_foreign = [Sponsor for Sponsor in list_18_19 if not Sponsor in list_20_22_non_kor]
+    
+    df_18_19_test = pd.DataFrame({'Sponsor' : list_18_19_non_foreign})
+    df_18_19_test.index += 1
+
+    writer = pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2018-2019.xlsx', engine = 'openpyxl')
+    df_18_19.to_excel(writer, sheet_name = '총data')
+    df_18_19_unique.to_excel(writer, sheet_name = 'Sponsor_list')
+    df_18_19_test.to_excel(writer, sheet_name = 'test')
+
+    writer.save()
+
+def kor_bio_global_18_19():
+    df_18_19_setup = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2018-2019.xlsx', sheet_name = 'test')
+    kor_list = df_18_19_setup['Sponsor'].dropna().to_list()
+    df_18_19 = pd.read_excel('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2018-2019.xlsx', sheet_name = '총data')
+    df_18_19_korea = df_18_19[df_18_19['Sponsor'].isin(kor_list)].reset_index(drop = True)
+    df_18_19_korea = df_18_19_korea.sort_values(by = ['Study_Country', 'Sponsor'])
+    df_18_19_korea = df_18_19_korea.drop(['Unnamed: 0'], axis = 1).reset_index(drop = True)
+    with pd.ExcelWriter('C:/Users/CRS-P-135/Desktop/Clinicaltrials_gov/2018-2019.xlsx', mode = 'a', engine = 'openpyxl') as writer:
+        df_18_19_korea.to_excel(writer, sheet_name = '한국bio전체', index = False)
+
 
 # df_20_22.to_csv('C:/Users/CRS-P-135/Desktop/2020-2022.csv', encoding = 'utf-8-sig', index = False)
 if __name__ == "__main__":
-    kor_bio_global()
+    kor_bio_global_18_19()
